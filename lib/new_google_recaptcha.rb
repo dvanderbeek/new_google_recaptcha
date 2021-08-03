@@ -9,12 +9,13 @@ module NewGoogleRecaptcha
     yield(self)
   end
 
-  def self.human?(token, action, minimum_score = self.minimum_score, model = nil)
+  def self.human?(token, action, minimum_score = self.minimum_score, model = nil, secret_key = nil)
     is_valid =
       NewGoogleRecaptcha::Validator.new(
         token: token,
         action: action,
-        minimum_score: minimum_score
+        minimum_score: minimum_score,
+        secret_key: secret_key
       ).call
 
     if model && !is_valid
@@ -24,12 +25,13 @@ module NewGoogleRecaptcha
     is_valid
   end
 
-  def self.get_humanity_detailed(token, action, minimum_score = self.minimum_score, model = nil)
+  def self.get_humanity_detailed(token, action, minimum_score = self.minimum_score, model = nil, secret_key = nil)
     validator =
       NewGoogleRecaptcha::Validator.new(
         token: token,
         action: action,
-        minimum_score: minimum_score
+        minimum_score: minimum_score,
+        secret_key: secret_key
       )
 
     is_valid = validator.call
@@ -49,10 +51,11 @@ module NewGoogleRecaptcha
     end
   end
 
-  def self.compose_uri(token)
+  def self.compose_uri(token, secret_key = nil)
+    secret_key ||= self.secret_key
     URI(
       "https://www.google.com/recaptcha/api/siteverify?"\
-      "secret=#{self.secret_key}&response=#{token}"
+      "secret=#{secret_key}&response=#{token}"
     )
   end
 end
